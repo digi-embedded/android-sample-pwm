@@ -1,4 +1,4 @@
-package com.example.android.pwmsample;
+package com.digi.android.pwmsample;
 
 import java.util.ArrayList;
 
