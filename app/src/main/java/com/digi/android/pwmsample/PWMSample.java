@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2014-2015 Digi International Inc.,
+ * All rights not expressly granted are reserved.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * Digi International Inc. 11001 Bren Road East, Minnetonka, MN 55343
+ * =======================================================================
+ */
+
 package com.digi.android.pwmsample;
 
 import java.util.ArrayList;
@@ -20,6 +32,15 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
+/**
+ * PWM sample application.
+ *
+ * <p>This example demonstrates the usage of the PWM API. User is allowed to configure
+ * and control all the available PWM channels in the device.</p>
+ *
+ * <p>For a complete description on the example, refer to the 'README.md' file
+ * included in the example directory.</p>
+ */
 public class PWMSample extends Activity {
 
 	// Constants.
@@ -43,21 +64,15 @@ public class PWMSample extends Activity {
 	
 	private ArrayList<String> channelSpinnerList;
 	
-	/*
-	 * (non-Javadoc)
-	 * @see android.app.Activity#onCreate(android.os.Bundle)
-	 */
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		// Initialize the application UI.
 		initializeUI();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see android.app.Activity#onResume()
-	 */
+	
+	@Override
 	protected void onResume() {
 		super.onResume();
 		// Disable the UI.
@@ -90,28 +105,15 @@ public class PWMSample extends Activity {
 		// Fill the spinner values.
 		fillPWMChannels();
 		channelSelector.setOnItemSelectedListener(new OnItemSelectedListener() {
-			/*
-			 * (non-Javadoc)
-			 * @see android.widget.AdapterView.OnItemSelectedListener#onItemSelected(android.widget.AdapterView, android.view.View, int, long)
-			 */
 			public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 				handlePWMChannelSelection();
 			}
-			
-			/*
-			 * (non-Javadoc)
-			 * @see android.widget.AdapterView.OnItemSelectedListener#onNothingSelected(android.widget.AdapterView)
-			 */
 			public void onNothingSelected(AdapterView<?> arg0) {
 				enableUI(false);
 			}
 		});
 		enableButton = (Switch)findViewById(R.id.enable_button);
 		enableButton.setOnClickListener(new OnClickListener() {
-			/*
-			 * (non-Javadoc)
-			 * @see android.view.View.OnClickListener#onClick(android.view.View)
-			 */
 			public void onClick(View v) {
 				handleEnableButtonPressed();
 			}
@@ -120,40 +122,24 @@ public class PWMSample extends Activity {
 		dutyCycleText = (EditText)findViewById(R.id.duty_text);
 		polarityInversedButton = (RadioButton)findViewById(R.id.polarity_inverted_button);
 		polarityInversedButton.setOnClickListener(new OnClickListener() {
-			/*
-			 * (non-Javadoc)
-			 * @see android.view.View.OnClickListener#onClick(android.view.View)
-			 */
 			public void onClick(View v) {
 				handlePolarityInversedButtonPressed();
 			}
 		});
 		polarityNormalButton = (RadioButton)findViewById(R.id.polarity_normal_button);
 		polarityNormalButton.setOnClickListener(new OnClickListener() {
-			/*
-			 * (non-Javadoc)
-			 * @see android.view.View.OnClickListener#onClick(android.view.View)
-			 */
 			public void onClick(View v) {
 				handlePolarityNormalButtonPressed();
 			}
 		});
 		applyFrequencyButton = (Button)findViewById(R.id.apply_frequency_button);
 		applyFrequencyButton.setOnClickListener(new OnClickListener() {
-			/*
-			 * (non-Javadoc)
-			 * @see android.view.View.OnClickListener#onClick(android.view.View)
-			 */
 			public void onClick(View v) {
 				handleApplyFrequencyButtonPressed();
 			}
 		});
 		applyDutyCycleButton = (Button)findViewById(R.id.apply_duty_button);
 		applyDutyCycleButton.setOnClickListener(new OnClickListener() {
-			/*
-			 * (non-Javadoc)
-			 * @see android.view.View.OnClickListener#onClick(android.view.View)
-			 */
 			public void onClick(View v) {
 				handleApplyDutyCycleButtonPressed();
 			}
@@ -187,10 +173,10 @@ public class PWMSample extends Activity {
 			enableButton.setChecked(false);
 		// Check frequency.
 		double frequency = pwmChannel.getFrequency();
-		frequencyText.setText("" + frequency);
+		frequencyText.setText(String.valueOf(frequency));
 		// Check duty cycle.
 		long dutyCycle = pwmChannel.getDutyCycle();
-		dutyCycleText.setText("" + dutyCycle);
+		dutyCycleText.setText(String.valueOf(dutyCycle));
 		// Check polarity.
 		int polarity = pwmChannel.getPolarity();
 		switch (polarity) {
@@ -414,8 +400,12 @@ public class PWMSample extends Activity {
 		// Kernel 3.0 version and SBCs do not allow to modify several of the PWM parameters.
 		String kernelVersion = BoardUtils.getKernelVersion();
 		boolean supported = true;
-		if (kernelVersion.startsWith(KERNEL_3_0) || BoardUtils.isMX6SBC())
-		    supported = false;
+		if ((kernelVersion != null && kernelVersion.startsWith(KERNEL_3_0)) || BoardUtils.isMX6SBC()) {
+			supported = false;
+			(findViewById(R.id.polarity_tview)).setVisibility(View.INVISIBLE);
+			polarityInversedButton.setVisibility(View.INVISIBLE);
+			polarityNormalButton.setVisibility(View.INVISIBLE);
+		}
 		enableButton.setEnabled(enable && supported);
 		frequencyText.setEnabled(enable && supported);
 		dutyCycleText.setEnabled(enable);
@@ -442,12 +432,12 @@ public class PWMSample extends Activity {
 		channelSpinnerList = new ArrayList<String>();
 		// Read available channels and store them in the array.
 		int[] availableChannels = PWM.listAvilableChannels();
-		for (int i = 0; i < availableChannels.length; i++) {
+		for (int availableChannel : availableChannels) {
 			// Channel 0 is NOT allowed in this application using a Connect Card for i.MX28
 			// as it controls the display backlight.
-			if (availableChannels[i] == 0 && BoardUtils.isMX28())
+			if (availableChannel == 0 && BoardUtils.isMX28())
 				continue;
-			channelSpinnerList.add("" + availableChannels[i]);
+			channelSpinnerList.add("" + availableChannel);
 		}
 		// Create an array adapter using our channels array.
 		ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, channelSpinnerList);

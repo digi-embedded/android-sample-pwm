@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2014-2015 Digi International Inc.,
+ * All rights not expressly granted are reserved.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * Digi International Inc. 11001 Bren Road East, Minnetonka, MN 55343
+ * =======================================================================
+ */
+
 package com.digi.android.pwmsample;
 
 import java.io.BufferedReader;
@@ -14,15 +26,11 @@ import android.util.Log;
  */
 class BoardUtils {
 	
-	// Constants
-	private final static String BOARD_VERSION_FILE_MX51 = "/sys/kernel/ccwmx51/bb_rev";
-	private final static String BOARD_VERSION_FILE_MX53 = "/sys/kernel/ccwmx53/bb_rev";
+	// Constants.
 	private final static String BOARD_VERSION_FILE_MX28 = "/sys/kernel/ccardimx28/mod_ver";
-	private final static String BOARD_VERSION_FILE_MX6ADPT = "/sys/kernel/ccimx6adpt/mod_ver";
 	private final static String BOARD_VERSION_FILE_MX6SBC = "/sys/kernel/ccimx6sbc/mod_ver";
 	private final static String BOARD_VERSION_FILE_CC6SBC = "/proc/device-tree/digi,hwid,hv";
 	private final static String KERNEL_VERSION_FILE = "/proc/version";
-	private final static String EAK_REVISION = "1";
 	
 	private final static String PROC_VERSION_REGEX =
 					"\\w+\\s+" + /* ignore: Linux */
@@ -35,64 +43,15 @@ class BoardUtils {
 					"(.+)"; /* group 4: date */
 	
 	private final static String LOG_TAG = "Board Utils";
-	
-	/**
-	 * Checks whether the board where module is mounted is an EAK version
-	 * (1) or not.
-	 * 
-	 * @return True if the board is an EAK version, false otherwise.
-	 */
-	public static boolean isMX51EAK() {
-		if (readFile(new File(BOARD_VERSION_FILE_MX53)) != null)
-			return false;  // This way null pointer exceptions are avoided in case it's a MX53 module.
-		if (readFile(new File(BOARD_VERSION_FILE_MX51)).equals(EAK_REVISION))
-			return true;
-		return false;
-	}
 
-	/**
-	 * Checks whether the module is a CCWi.i-MX51
-	 * 
-	 * @return True if the board is a MX51 board, false otherwise.
-	 */
-	public static boolean isMX51() {
-		if (readFile(new File(BOARD_VERSION_FILE_MX51)) != null)
-			return true;
-		return false;
-	}
-	
-	/**
-	 * Checks whether the module is a CCWi.i-MX53
-	 * 
-	 * @return True if the board is a MX53 board, false otherwise.
-	 */
-	public static boolean isMX53() {
-		if (readFile(new File(BOARD_VERSION_FILE_MX53)) != null)
-			return true;
-		return false;
-	}
 
-	
 	/**
 	 * Checks whether the module is a CCWi.i-MX28
 	 * 
 	 * @return True if the board is a MX28 board, false otherwise.
 	 */
 	public static boolean isMX28() {
-		if (readFile(new File(BOARD_VERSION_FILE_MX28)) != null)
-			return true;
-		return false;
-	}
-	
-	/**
-	 * Checks whether the module is a CC i-MX6 ADPT
-	 * 
-	 * @return True if the board is a MX6 board, false otherwise.
-	 */
-	public static boolean isMX6ADPT() {
-		if (readFile(new File(BOARD_VERSION_FILE_MX6ADPT)) != null)
-			return true;
-		return false;
+		return readFile(new File(BOARD_VERSION_FILE_MX28)) != null;
 	}
 
 	/**
@@ -101,12 +60,9 @@ class BoardUtils {
 	 * @return True if the board is a MX6 board, false otherwise.
 	 */
 	public static boolean isMX6SBC() {
-	    if ((readFile(new File(BOARD_VERSION_FILE_MX6SBC)) != null) ||
-	        (readFile(new File(BOARD_VERSION_FILE_CC6SBC)) != null) )
-			return true;
-		return false;
+		return (readFile(new File(BOARD_VERSION_FILE_MX6SBC)) != null) ||
+				(readFile(new File(BOARD_VERSION_FILE_CC6SBC)) != null);
 	}
-
 	/**
 	 * Retrieves the system kernel version.
 	 * 
@@ -136,7 +92,6 @@ class BoardUtils {
 	 * a String.</p>
 	 * 
 	 * @param file File to read first line from.
-	 * @throws IOException On error. Error may occur while trying to read File.
 	 */
 	private static String readFile(File file) {
 		if (!file.exists())

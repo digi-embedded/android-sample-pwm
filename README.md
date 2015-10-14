@@ -10,8 +10,8 @@ Demo requirements
 To run this example you need:
 
 * One compatible device to host the application.
-* Network connection between the device and the host PC in order to transfer
-  and launch the application.
+* A USB connection between the device and the host PC in order to transfer and
+  launch the application.
 * Establish remote target connection to your Digi hardware before running this
   application.
 
@@ -21,8 +21,7 @@ Demo setup
 Make sure the hardware is set up correctly:
 
 1. The device is powered on.
-2. The device is connected directly to the PC or to the Local Area Network (LAN)
-   by the Ethernet cable.
+2. The device is connected directly to the PC by the micro USB cable.
 
 Demo run
 --------
@@ -56,10 +55,19 @@ In the SBC board v2, PWM channels are mapped as follows:
 **\*\*Note**: Pull-up resistors may be required in order to measure PWM signals
 from above pins.
 
-Tested on
----------
+Compatible with
+---------------
 
 * ConnectCard for i.MX28
 * ConnectCore 6 Adapter Board
 * ConnectCore 6 SBC
 * ConnectCore 6 SBC v2
+
+License
+---------
+
+This software is open-source software. Copyright Digi International, 2014-2015.
+
+This Source Code Form is subject to the terms of the Mozilla Public License,
+v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain
+one at http://mozilla.org/MPL/2.0/.
