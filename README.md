@@ -12,8 +12,6 @@ To run this example you need:
 * One compatible device to host the application.
 * A USB connection between the device and the host PC in order to transfer and
   launch the application.
-* Establish remote target connection to your Digi hardware before running this
-  application.
 
 Demo setup
 ----------
@@ -37,7 +35,7 @@ parameters:
 * **Frequency (Hz)**: Sets the PWM channel frequency in hertz.
 * **Duty Cycle (%)**: Sets the PWM channel duty cycle as percentage (0-100).
 * **Polarity**: Configures the selected PWM channel polarity between _Normal_
-  and _Inversed_.
+  and _Inverted_.
 
 **\*\*Note**: Kernel 3.0 does not allow to modify some of the PWM channel
 parameters, so they may appear as disabled in the application.
@@ -58,13 +56,11 @@ from above pins.
 Compatible with
 ---------------
 
-* ConnectCard for i.MX28
-* ConnectCore 6 Adapter Board
 * ConnectCore 6 SBC
 * ConnectCore 6 SBC v2
 
 License
----------
+-------
 
 This software is open-source software. Copyright Digi International, 2014-2015.
 

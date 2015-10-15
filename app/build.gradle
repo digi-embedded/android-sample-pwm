@@ -1,9 +1,9 @@
 apply plugin: 'com.android.application'
 android {
     compileSdkVersion 19
-    buildToolsVersion "23.0.1"
+    buildToolsVersion '19.1.0'
     defaultConfig {
-        applicationId 'com.digi.android.pwmsample'
+        applicationId 'com.digi.android.pwm'
         minSdkVersion 19
         targetSdkVersion 19
     }
@@ -15,7 +15,4 @@ android {
     }
     productFlavors {
     }
-}
-
-dependencies {
 }

@@ -6,7 +6,7 @@
     <string name="enable">Enable: </string>
     <string name="polarity">Polarity: </string>
     <string name="normal">Normal</string>
-    <string name="inversed">Inversed</string>
+    <string name="inverted">Inverted</string>
     <string name="default_frequency">1</string>
     <string name="default_duty">50</string>
     <string name="apply">Apply</string>

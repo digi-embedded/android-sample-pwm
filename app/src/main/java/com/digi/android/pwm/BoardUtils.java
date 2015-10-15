@@ -10,7 +10,7 @@
  * =======================================================================
  */
 
-package com.digi.android.pwmsample;
+package com.digi.android.pwm;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,7 +27,6 @@ import android.util.Log;
 class BoardUtils {
 	
 	// Constants.
-	private final static String BOARD_VERSION_FILE_MX28 = "/sys/kernel/ccardimx28/mod_ver";
 	private final static String BOARD_VERSION_FILE_MX6SBC = "/sys/kernel/ccimx6sbc/mod_ver";
 	private final static String BOARD_VERSION_FILE_CC6SBC = "/proc/device-tree/digi,hwid,hv";
 	private final static String KERNEL_VERSION_FILE = "/proc/version";
@@ -43,16 +42,6 @@ class BoardUtils {
 					"(.+)"; /* group 4: date */
 	
 	private final static String LOG_TAG = "Board Utils";
-
-
-	/**
-	 * Checks whether the module is a CCWi.i-MX28
-	 * 
-	 * @return True if the board is a MX28 board, false otherwise.
-	 */
-	public static boolean isMX28() {
-		return readFile(new File(BOARD_VERSION_FILE_MX28)) != null;
-	}
 
 	/**
 	 * Checks whether the module is a CC i-MX6 SBC

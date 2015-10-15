@@ -10,7 +10,7 @@
  * =======================================================================
  */
 
-package com.digi.android.pwmsample;
+package com.digi.android.pwm;
 
 import java.util.ArrayList;
 
@@ -50,7 +50,7 @@ public class PWMSample extends Activity {
 	private Switch enableButton;
 
 	private RadioButton polarityNormalButton;
-	private RadioButton polarityInversedButton;
+	private RadioButton polarityInvertedButton;
 
 	private EditText frequencyText;
 	private EditText dutyCycleText;
@@ -105,41 +105,48 @@ public class PWMSample extends Activity {
 		// Fill the spinner values.
 		fillPWMChannels();
 		channelSelector.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
 			public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 				handlePWMChannelSelection();
 			}
+			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
 				enableUI(false);
 			}
 		});
 		enableButton = (Switch)findViewById(R.id.enable_button);
 		enableButton.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				handleEnableButtonPressed();
 			}
 		});
 		frequencyText = (EditText)findViewById(R.id.frequency_text);
 		dutyCycleText = (EditText)findViewById(R.id.duty_text);
-		polarityInversedButton = (RadioButton)findViewById(R.id.polarity_inverted_button);
-		polarityInversedButton.setOnClickListener(new OnClickListener() {
+		polarityInvertedButton = (RadioButton)findViewById(R.id.polarity_inverted_button);
+		polarityInvertedButton.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				handlePolarityInversedButtonPressed();
 			}
 		});
 		polarityNormalButton = (RadioButton)findViewById(R.id.polarity_normal_button);
 		polarityNormalButton.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				handlePolarityNormalButtonPressed();
 			}
 		});
 		applyFrequencyButton = (Button)findViewById(R.id.apply_frequency_button);
 		applyFrequencyButton.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				handleApplyFrequencyButtonPressed();
 			}
 		});
 		applyDutyCycleButton = (Button)findViewById(R.id.apply_duty_button);
 		applyDutyCycleButton.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				handleApplyDutyCycleButtonPressed();
 			}
@@ -180,14 +187,14 @@ public class PWMSample extends Activity {
 		// Check polarity.
 		int polarity = pwmChannel.getPolarity();
 		switch (polarity) {
-		case PWM.POLARITY_INVERSED:
-			polarityInversedButton.setChecked(true);
-			polarityNormalButton.setChecked(false);
-			break;
-		case PWM.POLARITY_NORMAL:
-			polarityNormalButton.setChecked(true);
-			polarityInversedButton.setChecked(false);
-			break;
+			case PWM.POLARITY_INVERSED:
+				polarityInvertedButton.setChecked(true);
+				polarityNormalButton.setChecked(false);
+				break;
+			case PWM.POLARITY_NORMAL:
+				polarityNormalButton.setChecked(true);
+				polarityInvertedButton.setChecked(false);
+				break;
 		}
 		// Enable the UI.
 		enableUI(true);
@@ -246,18 +253,18 @@ public class PWMSample extends Activity {
 	 * Handles what happens when the inverse polarity radio button is clicked.
 	 */
 	private void handlePolarityInversedButtonPressed() {
-		if (polarityInversedButton.isChecked()) {
+		if (polarityInvertedButton.isChecked()) {
 			if (setPWMPolarity(PWM.POLARITY_INVERSED))
 				polarityNormalButton.setChecked(false);
 			else {
 				polarityNormalButton.setChecked(true);
-				polarityInversedButton.setChecked(false);
+				polarityInvertedButton.setChecked(false);
 			}
 		} else {
 			if (setPWMPolarity(PWM.POLARITY_NORMAL))
 				polarityNormalButton.setChecked(true);
 			else {
-				polarityInversedButton.setChecked(true);
+				polarityInvertedButton.setChecked(true);
 				polarityNormalButton.setChecked(false);
 			}
 		}
@@ -269,16 +276,16 @@ public class PWMSample extends Activity {
 	private void handlePolarityNormalButtonPressed() {
 		if (polarityNormalButton.isChecked()) {
 			if (setPWMPolarity(PWM.POLARITY_NORMAL))
-				polarityInversedButton.setChecked(false);
+				polarityInvertedButton.setChecked(false);
 			else {
-				polarityInversedButton.setChecked(true);
+				polarityInvertedButton.setChecked(true);
 				polarityNormalButton.setChecked(false);
 			}
 		} else {
 			if (setPWMPolarity(PWM.POLARITY_INVERSED))
-				polarityInversedButton.setChecked(true);
+				polarityInvertedButton.setChecked(true);
 			else {
-				polarityInversedButton.setChecked(false);
+				polarityInvertedButton.setChecked(false);
 				polarityNormalButton.setChecked(true);
 			}
 		}
@@ -403,13 +410,13 @@ public class PWMSample extends Activity {
 		if ((kernelVersion != null && kernelVersion.startsWith(KERNEL_3_0)) || BoardUtils.isMX6SBC()) {
 			supported = false;
 			(findViewById(R.id.polarity_tview)).setVisibility(View.INVISIBLE);
-			polarityInversedButton.setVisibility(View.INVISIBLE);
+			polarityInvertedButton.setVisibility(View.INVISIBLE);
 			polarityNormalButton.setVisibility(View.INVISIBLE);
 		}
 		enableButton.setEnabled(enable && supported);
 		frequencyText.setEnabled(enable && supported);
 		dutyCycleText.setEnabled(enable);
-		polarityInversedButton.setEnabled(enable && supported);
+		polarityInvertedButton.setEnabled(enable && supported);
 		polarityNormalButton.setEnabled(enable && supported);
 		applyFrequencyButton.setEnabled(enable && supported);
 		applyDutyCycleButton.setEnabled(enable);
@@ -433,10 +440,6 @@ public class PWMSample extends Activity {
 		// Read available channels and store them in the array.
 		int[] availableChannels = PWM.listAvilableChannels();
 		for (int availableChannel : availableChannels) {
-			// Channel 0 is NOT allowed in this application using a Connect Card for i.MX28
-			// as it controls the display backlight.
-			if (availableChannel == 0 && BoardUtils.isMX28())
-				continue;
 			channelSpinnerList.add("" + availableChannel);
 		}
 		// Create an array adapter using our channels array.

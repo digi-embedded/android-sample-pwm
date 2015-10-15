@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.digi.android.pwmsample"
-	android:versionCode="1"
-	android:versionName="1.0" >
-	<application
-	  android:icon="@drawable/digi_icon"
-	  android:label="@string/app_name"
-	  android:allowBackup="true">
-	  <activity android:name=".PWMSample"
-			android:label="@string/app_name" >
-		<intent-filter>
-			<action android:name="android.intent.action.MAIN" />
-			<category android:name="android.intent.category.LAUNCHER" />
-		</intent-filter>
-	  </activity>
-	</application>
+    package="com.digi.android.pwm"
+    android:versionCode="1"
+    android:versionName="1.0">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/digi_icon"
+        android:label="@string/app_name">
+        <activity
+            android:name=".PWMSample"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
 </manifest>
