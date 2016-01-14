@@ -27,25 +27,17 @@ Demo run
 The example is already configured, so all you need to do is to build and launch 
 the project.
 
-Once application starts, choose a PWM Channel and configure all its PWM
-parameters:
+Once application starts, choose a PWM Channel and configure its parameters:
 
 * **PWM Channel**: PWM channel to configure and control.
-* **Enable**: Enables or disables the selected PWM channel.
-* **Frequency (Hz)**: Sets the PWM channel frequency in hertz.
 * **Duty Cycle (%)**: Sets the PWM channel duty cycle as percentage (0-100).
-* **Polarity**: Configures the selected PWM channel polarity between _Normal_
-  and _Inverted_.
-
-**\*\*Note**: Kernel 3.0 does not allow to modify some of the PWM channel
-parameters, so they may appear as disabled in the application.
 
 In the SBC board v1, PWM channels are mapped as follows:
 
 * PWM1 signal is connected on the SBC to pin 13 of connector J18 (MIPI DSI) to
   control the backlight contrast of the MIPI DSI display.
 
-In the SBC board v2, PWM channels are mapped as follows:
+In the SBC board v3, PWM channels are mapped as follows:
 
 * PWM2 signal is connected on the SBC to pin 13 of connector J16 (MIPI DSI) to
   control the backlight contrast of the MIPI DSI display.
@@ -57,12 +49,12 @@ Compatible with
 ---------------
 
 * ConnectCore 6 SBC
-* ConnectCore 6 SBC v2
+* ConnectCore 6 SBC v3
 
 License
 -------
 
-This software is open-source software. Copyright Digi International, 2014-2015.
+This software is open-source software. Copyright Digi International, 2014-2016.
 
 This Source Code Form is subject to the terms of the Mozilla Public License,
 v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain
