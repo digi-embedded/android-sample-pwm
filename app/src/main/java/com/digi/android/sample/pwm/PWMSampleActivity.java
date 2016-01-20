@@ -10,15 +10,12 @@
  * =======================================================================
  */
 
-package com.digi.android.pwm;
+package com.digi.android.sample.pwm;
 
 import java.util.ArrayList;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.pwm.PWM;
-import android.pwm.PWMException;
-import android.pwm.PWMManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -30,6 +27,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.digi.android.pwm.PWM;
+import com.digi.android.pwm.PWMException;
+import com.digi.android.pwm.PWMManager;
+
 /**
  * PWM sample application.
  *
@@ -39,12 +40,12 @@ import android.widget.Toast;
  * <p>For a complete description on the example, refer to the 'README.md' file
  * included in the example directory.</p>
  */
-public class PWMSample extends Activity {
+public class PWMSampleActivity extends Activity {
 	
 	// Variables.
 	private EditText dutyCycleText;
 
-	private PWMManager manager;
+	private PWMManager pwmManager;
 
 	private PWM pwmChannel;
 
@@ -56,7 +57,7 @@ public class PWMSample extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		manager = (PWMManager)getSystemService(PWM_SERVICE);
+		pwmManager = new PWMManager(this);
 		// Initialize the application UI.
 		initializeUI();
 		// Hide keyboard.
@@ -122,7 +123,7 @@ public class PWMSample extends Activity {
 		if (channelSpinnerList == null || channelSpinnerList.size() == 0)
 			return;
 		int channel = Integer.valueOf(channelSpinnerList.get(channelSelector.getSelectedItemPosition()));
-		pwmChannel = manager.createPWM(channel);
+		pwmChannel = pwmManager.createPWM(channel);
 		updateValuesFromPWMChannel();
 	}
 
@@ -198,7 +199,7 @@ public class PWMSample extends Activity {
 		// Initialize array to store elements.
 		channelSpinnerList = new ArrayList<>();
 		// Read available channels and store them in the array.
-		int[] availableChannels = manager.listChannels();
+		int[] availableChannels = pwmManager.listChannels();
 		for (int availableChannel : availableChannels) {
 			channelSpinnerList.add(String.valueOf(availableChannel));
 		}
