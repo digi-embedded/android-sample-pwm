@@ -37,11 +37,6 @@ In the SBC board v1, PWM channels are mapped as follows:
 * PWM1 signal is connected on the SBC to pin 13 of connector J18 (MIPI DSI) to
   control the backlight contrast of the MIPI DSI display.
 
-In the SBC board v3, PWM channels are mapped as follows:
-
-* PWM2 signal is connected on the SBC to pin 13 of connector J16 (MIPI DSI) to
-  control the backlight contrast of the MIPI DSI display.
-
 **\*\*Note**: Pull-up resistors may be required in order to measure PWM signals
 from above pins.
 
@@ -49,7 +44,6 @@ Compatible with
 ---------------
 
 * ConnectCore 6 SBC
-* ConnectCore 6 SBC v3
 
 License
 -------
