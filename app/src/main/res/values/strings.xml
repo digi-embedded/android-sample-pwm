@@ -3,7 +3,7 @@
     <string name="app_name">PWM Sample</string>
     <string name="frequency">Frequency (Hz): </string>
     <string name="duty_cycle">Duty Cycle (%): </string>
-    <string name="enable">Enable: </string>
+    <string name="enable">Enable </string>
     <string name="polarity">Polarity: </string>
     <string name="normal">Normal</string>
     <string name="inverted">Inverted</string>
@@ -11,5 +11,6 @@
     <string name="default_duty">50</string>
     <string name="apply">Apply</string>
     <string name="channel">PWM Channel: </string>
+    <string name="chip">PWM Chip: </string>
 
 </resources>

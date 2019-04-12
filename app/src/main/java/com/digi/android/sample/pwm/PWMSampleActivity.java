@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016, Digi International Inc. <support@digi.com>
+ * Copyright (c) 2014-2019, Digi International Inc. <support@digi.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,9 +17,13 @@
 package com.digi.android.sample.pwm;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -28,12 +32,16 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.digi.android.pwm.PWM;
+import com.digi.android.pwm.PWMChip;
 import com.digi.android.pwm.PWMException;
 import com.digi.android.pwm.PWMManager;
+import com.digi.android.pwm.PWMPolarity;
 
 /**
  * PWM sample application.
@@ -45,18 +53,38 @@ import com.digi.android.pwm.PWMManager;
  * included in the example directory.</p>
  */
 public class PWMSampleActivity extends Activity {
-	
+
 	// Variables.
+	private Switch enableButton;
+
+	private RadioButton polarityNormalButton;
+	private RadioButton polarityInvertedButton;
+
+	private EditText frequencyText;
 	private EditText dutyCycleText;
 
 	private PWMManager pwmManager;
 
 	private PWM pwmChannel;
 
+	private Spinner chipSelector;
 	private Spinner channelSelector;
 	
-	private ArrayList<String> channelSpinnerList;
-	
+	private ArrayList<PWMChip> chipsList;
+
+	private ArrayList<Integer> channelsList;
+
+	private ArrayAdapter<PWMChip> chipsAdapter;
+
+	private ArrayAdapter<Integer> channelsAdapter;
+
+	private PWMChip selectedChip = null;
+
+	private Integer selectedChannel = null;
+
+	private Button applyFrequencyButton;
+	private Button applyDutyCycleButton;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -71,6 +99,8 @@ public class PWMSampleActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		// Disable the UI.
+		enableUI(false);
 		// Check if the PWM channel is declared.
 		if (pwmChannel == null) {
 			try {
@@ -95,27 +125,131 @@ public class PWMSampleActivity extends Activity {
 	 * Initializes the UI components of the application.
 	 */
 	private void initializeUI() {
-		channelSelector = (Spinner)findViewById(R.id.channel_selector);
-		// Fill the spinner values.
-		fillPWMChannels();
-		channelSelector.setOnItemSelectedListener(new OnItemSelectedListener() {
+		// Chips spinner.
+		chipsList = new ArrayList<>();
+		chipsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, chipsList);
+		chipSelector = findViewById(R.id.chip_selector);
+		chipSelector.setAdapter(chipsAdapter);
+		chipSelector.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				handlePWMChannelSelection();
+				selectedChip = (PWMChip)chipSelector.getSelectedItem();
+				updateChannels();
 			}
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
-
+				channelsAdapter.clear();
+				channelsAdapter.notifyDataSetChanged();
+				selectedChip = null;
+				selectedChannel = null;
 			}
 		});
-		dutyCycleText = (EditText)findViewById(R.id.duty_text);
-		Button applyDutyCycleButton = (Button) findViewById(R.id.apply_duty_button);
+		// Channels spinner.
+		channelsList = new ArrayList<>();
+		channelsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, channelsList);
+		channelSelector = findViewById(R.id.channel_selector);
+		channelSelector.setAdapter(channelsAdapter);
+		channelSelector.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+				handleChannelSelectionChanged();
+			}
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				selectedChannel = null;
+				enableUI(false);
+			}
+		});
+		// Enable button.
+		enableButton = findViewById(R.id.enable_button);
+		enableButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				handleEnableButtonPressed();
+			}
+		});
+		// Polarity.
+		polarityInvertedButton = findViewById(R.id.polarity_inverted_button);
+		polarityInvertedButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (polarityInvertedButton.isChecked())
+					handlePolarityChanged(PWMPolarity.INVERSED);
+			}
+		});
+		polarityNormalButton = findViewById(R.id.polarity_normal_button);
+		polarityNormalButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (polarityNormalButton.isChecked())
+					handlePolarityChanged(PWMPolarity.NORMAL);
+			}
+		});
+		// Frequency.
+		frequencyText = findViewById(R.id.frequency_text);
+		// Duty cycle.
+		dutyCycleText = findViewById(R.id.duty_text);
+		// Apply frequency button.
+		applyFrequencyButton = findViewById(R.id.apply_frequency_button);
+		applyFrequencyButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				handleApplyFrequencyButtonPressed();
+			}
+		});
+		// Apply duty cycle button.
+		applyDutyCycleButton = findViewById(R.id.apply_duty_button);
 		applyDutyCycleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				handleApplyDutyCycleButtonPressed();
 			}
 		});
+		// Fill the chip values (will trigger channel values fill).
+		fillPWMChips();
+	}
+
+	/**
+	 * Fills the chips spinner with the available PWM chips.
+	 */
+	private void fillPWMChips() {
+		chipsList.clear();
+		// Read available chips and store them in the array.
+		List<PWMChip> availableChips = pwmManager.listPWMChips();
+		// If present, remove "pwmchip0" as it cannot be used (LVDS brightness)
+		for (PWMChip chip : availableChips) {
+			if (chip.getName().equalsIgnoreCase("pwmchip0")) {
+				availableChips.remove(chip);
+				break;
+			}
+		}
+		chipsList.addAll(availableChips);
+		Collections.sort(chipsList, new Comparator<PWMChip>(){
+			public int compare(PWMChip o1, PWMChip o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+		chipsAdapter.notifyDataSetChanged();
+		if (chipsList.size() > 0)
+			chipSelector.setSelection(0);
+		else
+			chipSelector.setSelection(-1);
+	}
+
+	/**
+	 * Updates the channels list depending on the selected chip.
+	 */
+	private void updateChannels() {
+		channelsList.clear();
+		List<Integer> channels = selectedChip.listChannels();
+		channelsList.addAll(channels);
+		Collections.sort(channelsList);
+		channelsAdapter.notifyDataSetChanged();
+		if (channelsList.size() > 0)
+			channelSelector.setSelection(0);
+		else
+			channelSelector.setSelection(-1);
+		handleChannelSelectionChanged();
 	}
 
 	/**
@@ -124,10 +258,10 @@ public class PWMSampleActivity extends Activity {
 	 * @throws PWMException if there was an error initializing the PWM channel.
 	 */
 	private void initializePWMChannel() throws PWMException {
-		if (channelSpinnerList == null || channelSpinnerList.size() == 0)
+		if (selectedChip == null || selectedChannel == null)
 			return;
-		int channel = Integer.valueOf(channelSpinnerList.get(channelSelector.getSelectedItemPosition()));
-		pwmChannel = pwmManager.createPWM(channel);
+
+		pwmChannel = pwmManager.createPWM(selectedChip, selectedChannel);
 		updateValuesFromPWMChannel();
 	}
 
@@ -137,37 +271,193 @@ public class PWMSampleActivity extends Activity {
 	 * @throws PWMException if there is an error reading PWM parameters. 
 	 */
 	private void updateValuesFromPWMChannel() throws PWMException {
-		// Check duty cycle.
-		double dutyCycle = pwmChannel.getDutyCycle();
+
+		// Duty cycle
+		int dutyCycle = pwmChannel.getDutyCyclePercentage();
 		dutyCycleText.setText(String.valueOf((int)dutyCycle));
+		if (!BoardUtils.isMX6SBC()) {
+			// Frequency.
+			long frequency = pwmChannel.getFrequency();
+			frequencyText.setText(String.valueOf(frequency));
+			// Enablement.
+			boolean enabled = pwmChannel.isEnabled();
+			enableButton.setChecked(enabled);
+			// Polarity.
+			PWMPolarity polarity = pwmChannel.getPolarity();
+			switch (polarity) {
+				case INVERSED:
+					polarityInvertedButton.setChecked(true);
+					polarityNormalButton.setChecked(false);
+					break;
+				case NORMAL:
+					polarityNormalButton.setChecked(true);
+					polarityInvertedButton.setChecked(false);
+					break;
+			}
+		}
+		// Enable the UI.
+		enableUI(true);
 	}
-	
+
+	/**
+	 * Handles what happens when the channel selection changes.
+	 */
+	private void handleChannelSelectionChanged() {
+		selectedChannel = (Integer)channelSelector.getSelectedItem();
+		if (selectedChannel == null)
+			return;
+		try {
+			initializePWMChannel();
+		} catch (PWMException e) {
+			showToast("Error initializing PWM channel: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Handles what happens when the enable button is pressed.
+	 */
+	private void handleEnableButtonPressed() {
+		if (enableButton.isChecked()) {
+			if (!enablePWM(true))
+				enableButton.setChecked(false);
+		} else {
+			if (!enablePWM(false))
+				enableButton.setChecked(true);
+		}
+	}
+
+	/**
+	 * Enables the PWM channel.
+	 *
+	 * @param enable {@code true} to enable the PWM channel, {@code false} otherwise.
+	 *
+	 * @return True if success, false otherwise.
+	 */
+	private boolean enablePWM(boolean enable) {
+		if (pwmChannel == null)
+			return false;
+
+		try {
+			pwmChannel.setEnabled(enable);
+			return true;
+		} catch (PWMException e) {
+			showToast("Error enabling PWM channel: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * Handles what happens when the polarity configuration changes.
+	 *
+	 * @param polarity The new polarity.
+	 */
+	private void handlePolarityChanged(PWMPolarity polarity) {
+		switch (polarity) {
+			case NORMAL:
+				if (setPolarity(PWMPolarity.NORMAL)) {
+					polarityNormalButton.setChecked(true);
+					polarityInvertedButton.setChecked(false);
+				} else {
+					polarityInvertedButton.setChecked(true);
+					polarityNormalButton.setChecked(false);
+				}
+				break;
+			case INVERSED:
+				if (setPolarity(PWMPolarity.INVERSED)) {
+					polarityNormalButton.setChecked(false);
+					polarityInvertedButton.setChecked(true);
+				} else {
+					polarityInvertedButton.setChecked(false);
+					polarityNormalButton.setChecked(true);
+				}
+				break;
+		}
+	}
+
+	/**
+	 * Changes the PWM channel polarity with the given one.
+	 *
+	 * @param polarity New polarity to set.
+	 *
+	 * @return {@code true} if polarity was set correctly, {@code false} otherwise.
+	 */
+	private boolean setPolarity(PWMPolarity polarity) {
+		if (pwmChannel == null)
+			return false;
+
+		try {
+			pwmChannel.setPolarity(polarity);
+			return true;
+		} catch (PWMException e) {
+			showToast("Error changing PWM channel polarity: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * Handles what happens when the apply frequency button is pressed.
+	 */
+	private void handleApplyFrequencyButtonPressed() {
+		long frequency;
+		if (frequencyText.getText().toString().length() == 0) {
+			showToast("Frequency value cannot be empty");
+			return;
+		}
+		try {
+			frequency = Long.parseLong(frequencyText.getText().toString());
+			setFrequency(frequency);
+		} catch (NumberFormatException e) {
+			showToast("The specified frequency is not valid: " + frequencyText.getText());
+		}
+	}
+
+	/**
+	 * Sets the PWM channel frequency.
+	 *
+	 * @param frequency The frequency to set.
+	 */
+	private void setFrequency(long frequency) {
+		if (pwmChannel == null)
+			return;
+
+		// There might be a problem setting the frequency as configured duty cycle value
+		// could be greater than the new period. To avoid it, set duty cycle to a very low value
+		// and then restore it.
+		int dutyCyclePercentage = -1;
+		try {
+			dutyCyclePercentage = pwmChannel.getDutyCyclePercentage();
+			pwmChannel.setDutyCyclePercentage(0);
+			pwmChannel.setFrequency(frequency);
+		} catch (IllegalArgumentException | PWMException e) {
+			showToast("Error setting PWM channel frequency: " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			// Restore dutyCycle.
+			if (dutyCyclePercentage != -1) {
+				try {
+					pwmChannel.setDutyCyclePercentage(dutyCyclePercentage);
+				} catch (Exception e) { }
+			}
+		}
+	}
+
 	/**
 	 * Handles what happens when the apply duty cycle button is pressed.
 	 */
 	private void handleApplyDutyCycleButtonPressed() {
-		int dutyCycle ;
+		int dutyCycle;
 		if (dutyCycleText.getText().toString().length() == 0) {
 			showToast("Duty cycle value cannot be empty");
 			return;
 		}
 		try {
 			dutyCycle = Integer.parseInt(dutyCycleText.getText().toString());
-			setPWMChannelDutyCycle(dutyCycle);
+			setDutyCycle(dutyCycle);
 		} catch (NumberFormatException e) {
 			showToast("The specified duty cycle is not valid: " + dutyCycleText.getText());
-		}
-	}
-	
-	/**
-	 * Handles what happens when a PWM Channel is selected.
-	 */
-	private void handlePWMChannelSelection() {
-		try {
-			initializePWMChannel();
-		} catch (PWMException e) {
-			showToast("Error initializing PWM channel: " + e.getMessage());
-			e.printStackTrace();
 		}
 	}
 	
@@ -176,13 +466,14 @@ public class PWMSampleActivity extends Activity {
 	 * 
 	 * @param dutyCycle The Duty cycle to set.
 	 */
-	private void setPWMChannelDutyCycle(int dutyCycle) {
+	private void setDutyCycle(int dutyCycle) {
 		if (pwmChannel == null)
 			return;
+
 		try {
-			pwmChannel.setDutyCycle(dutyCycle);
+			pwmChannel.setDutyCyclePercentage(dutyCycle);
 		} catch (IllegalArgumentException | PWMException e) {
-			showToast("Error setting PWM channel duty cycle: " + e.getMessage());
+			showToast("Error setting PWM channel duty cycle percentage: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -195,21 +486,30 @@ public class PWMSampleActivity extends Activity {
 	private void showToast(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
-	
+
 	/**
-	 * Fills the channel spinner with the available PWM channels.
+	 * Changes the enable status of the UI.
+	 *
+	 * @param enable True to enable UI, false to disable.
 	 */
-	private void fillPWMChannels() {
-		// Initialize array to store elements.
-		channelSpinnerList = new ArrayList<>();
-		// Read available channels and store them in the array.
-		int[] availableChannels = pwmManager.listChannels();
-		for (int availableChannel : availableChannels) {
-			channelSpinnerList.add(String.valueOf(availableChannel));
+	private void enableUI(boolean enable) {
+		// CCIMX6 does not allow to modify several of the PWM parameters.
+		boolean supported = true;
+		if (BoardUtils.isMX6SBC()) {
+			supported = false;
+			(findViewById(R.id.chip_tview)).setVisibility(View.INVISIBLE);
+			chipSelector.setVisibility(View.INVISIBLE);
+			(findViewById(R.id.polarity_tview)).setVisibility(View.INVISIBLE);
+			polarityInvertedButton.setVisibility(View.INVISIBLE);
+			polarityNormalButton.setVisibility(View.INVISIBLE);
+			enableButton.setVisibility(View.INVISIBLE);
 		}
-		// Create an array adapter using our channels array.
-		ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, channelSpinnerList);
-		// Set the array adapter to the PWM channels spinner.
-		channelSelector.setAdapter(spinnerArrayAdapter);
+		enableButton.setEnabled(enable && supported);
+		frequencyText.setEnabled(enable && supported);
+		dutyCycleText.setEnabled(enable);
+		polarityInvertedButton.setEnabled(enable && supported);
+		polarityNormalButton.setEnabled(enable && supported);
+		applyFrequencyButton.setEnabled(enable && supported);
+		applyDutyCycleButton.setEnabled(enable);
 	}
 }

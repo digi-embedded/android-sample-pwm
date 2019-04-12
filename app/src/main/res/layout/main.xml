@@ -8,50 +8,181 @@
     android:gravity="center">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="500dp"
         android:layout_height="wrap_content"
         android:background="@drawable/border"
-        android:padding="50dp">
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/chip_tview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/chip"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/white" />
+
+            <Spinner
+                android:id="@+id/chip_selector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dropdown"
+                android:layout_marginLeft="28dip"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/channel_tview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/channel"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/white" />
+
+            <Spinner
+                android:id="@+id/channel_selector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_height="wrap_content">
+
+            <Switch
+                android:id="@+id/enable_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:enabled="false" />
+            <TextView
+                android:id="@+id/enable_tview"
+                android:layout_width="wrap_content"
+                android:text="@string/enable"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/frequency_tview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@+id/frequency_text"
+                android:text="@string/frequency"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/white" />
+
+            <EditText
+                android:id="@+id/frequency_text"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:ems="10"
+                android:enabled="false"
+                android:inputType="numberDecimal"
+                android:maxLength="9"
+                android:text="@string/default_frequency"
+                />
+
+            <Button
+                android:id="@+id/apply_frequency_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/apply"
+                android:enabled="false" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/duty_tview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@+id/duty_text"
+                android:text="@string/duty_cycle"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/white" />
+
+            <EditText
+                android:id="@+id/duty_text"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="true"
+                android:inputType="numberDecimal"
+                android:maxLength="3"
+                android:text="@string/default_duty"
+                android:layout_marginLeft="17dip"/>
+
+            <Button
+                android:id="@+id/apply_duty_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/apply" />
+
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/channel_tview"
+            android:id="@+id/polarity_tview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/channel"
-            android:textSize="20sp" />
+            android:layout_below="@+id/apply_duty_button"
+            android:layout_alignParentStart="true"
+            android:text="@string/polarity"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white"
+            android:visibility="visible" />
 
-        <Spinner
-            android:id="@+id/channel_selector"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:spinnerMode="dropdown"/>
-
-        <TextView
-            android:id="@+id/duty_tview"
+        <RadioButton
+            android:id="@+id/polarity_normal_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:labelFor="@+id/duty_text"
-            android:text="@string/duty_cycle"
-            android:textSize="20sp"
-            android:layout_marginTop="20dp" />
+            android:layout_below="@+id/apply_duty_button"
+            android:layout_alignStart="@+id/enable_button"
+            android:checked="true"
+            android:enabled="false"
+            android:text="@string/normal" />
 
-        <EditText
-            android:id="@+id/duty_text"
-            android:layout_width="match_parent"
+        <RadioButton
+            android:id="@+id/polarity_inverted_button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:enabled="true"
-            android:inputType="number"
-            android:maxLength="3"
-            android:text="@string/default_duty" />
+            android:layout_below="@+id/polarity_normal_button"
+            android:layout_alignStart="@+id/enable_button"
+            android:checked="false"
+            android:enabled="false"
+            android:text="@string/inverted" />
 
-        <Button
-            android:id="@+id/apply_duty_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/apply"
-            android:layout_marginTop="40dp" />
     </LinearLayout>
 
 </LinearLayout>
