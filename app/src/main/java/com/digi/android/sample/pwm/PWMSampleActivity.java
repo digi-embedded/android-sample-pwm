@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2014-2019, Digi International Inc. <support@digi.com>
+/*
+ * Copyright (c) 2014-2021, Digi International Inc. <support@digi.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -53,6 +54,9 @@ import com.digi.android.pwm.PWMPolarity;
  * included in the example directory.</p>
  */
 public class PWMSampleActivity extends Activity {
+
+	// Constants.
+	private final static String CCIMX6SBC_NAME = "ccimx6sbc";
 
 	// Variables.
 	private Switch enableButton;
@@ -275,7 +279,7 @@ public class PWMSampleActivity extends Activity {
 		// Duty cycle
 		int dutyCycle = pwmChannel.getDutyCyclePercentage();
 		dutyCycleText.setText(String.valueOf((int)dutyCycle));
-		if (!BoardUtils.isMX6SBC()) {
+		if (!Build.DEVICE.equals(CCIMX6SBC_NAME)) {
 			// Frequency.
 			long frequency = pwmChannel.getFrequency();
 			frequencyText.setText(String.valueOf(frequency));
@@ -495,7 +499,7 @@ public class PWMSampleActivity extends Activity {
 	private void enableUI(boolean enable) {
 		// CCIMX6 does not allow to modify several of the PWM parameters.
 		boolean supported = true;
-		if (BoardUtils.isMX6SBC()) {
+		if (Build.DEVICE.equals(CCIMX6SBC_NAME)) {
 			supported = false;
 			(findViewById(R.id.chip_tview)).setVisibility(View.INVISIBLE);
 			chipSelector.setVisibility(View.INVISIBLE);
