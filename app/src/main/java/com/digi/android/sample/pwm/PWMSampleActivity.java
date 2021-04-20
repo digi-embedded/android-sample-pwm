@@ -24,7 +24,6 @@ import java.util.List;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -277,8 +276,7 @@ public class PWMSampleActivity extends Activity {
 	private void updateValuesFromPWMChannel() throws PWMException {
 
 		// Duty cycle
-		int dutyCycle = pwmChannel.getDutyCyclePercentage();
-		dutyCycleText.setText(String.valueOf((int)dutyCycle));
+		dutyCycleText.setText(String.valueOf(pwmChannel.getDutyCyclePercentage()));
 		if (!Build.DEVICE.equals(CCIMX6SBC_NAME)) {
 			// Frequency.
 			long frequency = pwmChannel.getFrequency();
@@ -322,6 +320,8 @@ public class PWMSampleActivity extends Activity {
 	 * Handles what happens when the enable button is pressed.
 	 */
 	private void handleEnableButtonPressed() {
+		boolean worked = enablePWM(enableButton.isChecked());
+		enableButton.setChecked(enableButton.isChecked() == worked);
 		if (enableButton.isChecked()) {
 			if (!enablePWM(true))
 				enableButton.setChecked(false);
@@ -443,7 +443,7 @@ public class PWMSampleActivity extends Activity {
 			if (dutyCyclePercentage != -1) {
 				try {
 					pwmChannel.setDutyCyclePercentage(dutyCyclePercentage);
-				} catch (Exception e) { }
+				} catch (Exception ignored) { }
 			}
 		}
 	}
