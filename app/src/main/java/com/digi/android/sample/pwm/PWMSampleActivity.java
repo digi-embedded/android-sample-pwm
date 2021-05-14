@@ -46,7 +46,7 @@ import com.digi.android.pwm.PWMPolarity;
 /**
  * PWM sample application.
  *
- * <p>This example demonstrates the usage of the PWM API. User is allowed to configure
+ * <p>This example demonstrates the usage of the PWM API. You can configure
  * and control all the available PWM channels in the device.</p>
  *
  * <p>For a complete description on the example, refer to the 'README.md' file
