@@ -218,15 +218,7 @@ public class PWMSampleActivity extends Activity {
 	private void fillPWMChips() {
 		chipsList.clear();
 		// Read available chips and store them in the array.
-		List<PWMChip> availableChips = pwmManager.listPWMChips();
-		// If present, remove "pwmchip0" as it cannot be used (LVDS brightness)
-		for (PWMChip chip : availableChips) {
-			if (chip.getName().equalsIgnoreCase("pwmchip0")) {
-				availableChips.remove(chip);
-				break;
-			}
-		}
-		chipsList.addAll(availableChips);
+		chipsList.addAll(pwmManager.listPWMChips());
 		Collections.sort(chipsList, new Comparator<PWMChip>(){
 			public int compare(PWMChip o1, PWMChip o2) {
 				return o1.getName().compareTo(o2.getName());
@@ -406,15 +398,17 @@ public class PWMSampleActivity extends Activity {
 	 */
 	private void handleApplyFrequencyButtonPressed() {
 		long frequency;
-		if (frequencyText.getText().toString().length() == 0) {
+
+		String freqString = frequencyText.getText().toString();
+		if (freqString.length() == 0) {
 			showToast("Frequency value cannot be empty");
 			return;
 		}
 		try {
-			frequency = Long.parseLong(frequencyText.getText().toString());
+			frequency = Long.parseLong(freqString);
 			setFrequency(frequency);
 		} catch (NumberFormatException e) {
-			showToast("The specified frequency is not valid: " + frequencyText.getText());
+			showToast("The specified frequency is not valid: " + freqString);
 		}
 	}
 
@@ -453,15 +447,17 @@ public class PWMSampleActivity extends Activity {
 	 */
 	private void handleApplyDutyCycleButtonPressed() {
 		int dutyCycle;
-		if (dutyCycleText.getText().toString().length() == 0) {
+
+		String dutyCycleString = dutyCycleText.getText().toString();
+		if (dutyCycleString.length() == 0) {
 			showToast("Duty cycle value cannot be empty");
 			return;
 		}
 		try {
-			dutyCycle = Integer.parseInt(dutyCycleText.getText().toString());
+			dutyCycle = Integer.parseInt(dutyCycleString);
 			setDutyCycle(dutyCycle);
 		} catch (NumberFormatException e) {
-			showToast("The specified duty cycle is not valid: " + dutyCycleText.getText());
+			showToast("The specified duty cycle is not valid: " + dutyCycleString);
 		}
 	}
 	
