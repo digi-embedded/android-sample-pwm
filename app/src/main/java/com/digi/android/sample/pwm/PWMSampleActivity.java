@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021, Digi International Inc. <support@digi.com>
+ * Copyright (c) 2014-2025, Digi International Inc. <support@digi.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -25,7 +25,6 @@ import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -165,28 +164,17 @@ public class PWMSampleActivity extends Activity {
 		});
 		// Enable button.
 		enableButton = findViewById(R.id.enable_button);
-		enableButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				handleEnableButtonPressed();
-			}
-		});
+		enableButton.setOnClickListener(v -> handleEnableButtonPressed());
 		// Polarity.
 		polarityInvertedButton = findViewById(R.id.polarity_inverted_button);
-		polarityInvertedButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (polarityInvertedButton.isChecked())
-					handlePolarityChanged(PWMPolarity.INVERSED);
-			}
+		polarityInvertedButton.setOnClickListener(v -> {
+			if (polarityInvertedButton.isChecked())
+				handlePolarityChanged(PWMPolarity.INVERSED);
 		});
 		polarityNormalButton = findViewById(R.id.polarity_normal_button);
-		polarityNormalButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (polarityNormalButton.isChecked())
-					handlePolarityChanged(PWMPolarity.NORMAL);
-			}
+		polarityNormalButton.setOnClickListener(v -> {
+			if (polarityNormalButton.isChecked())
+				handlePolarityChanged(PWMPolarity.NORMAL);
 		});
 		// Frequency.
 		frequencyText = findViewById(R.id.frequency_text);
@@ -194,20 +182,10 @@ public class PWMSampleActivity extends Activity {
 		dutyCycleText = findViewById(R.id.duty_text);
 		// Apply frequency button.
 		applyFrequencyButton = findViewById(R.id.apply_frequency_button);
-		applyFrequencyButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				handleApplyFrequencyButtonPressed();
-			}
-		});
+		applyFrequencyButton.setOnClickListener(v -> handleApplyFrequencyButtonPressed());
 		// Apply duty cycle button.
 		applyDutyCycleButton = findViewById(R.id.apply_duty_button);
-		applyDutyCycleButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				handleApplyDutyCycleButtonPressed();
-			}
-		});
+		applyDutyCycleButton.setOnClickListener(v -> handleApplyDutyCycleButtonPressed());
 		// Fill the chip values (will trigger channel values fill).
 		fillPWMChips();
 	}
@@ -219,13 +197,9 @@ public class PWMSampleActivity extends Activity {
 		chipsList.clear();
 		// Read available chips and store them in the array.
 		chipsList.addAll(pwmManager.listPWMChips());
-		Collections.sort(chipsList, new Comparator<PWMChip>(){
-			public int compare(PWMChip o1, PWMChip o2) {
-				return o1.getName().compareTo(o2.getName());
-			}
-		});
+		chipsList.sort(Comparator.comparing(PWMChip::getName));
 		chipsAdapter.notifyDataSetChanged();
-		if (chipsList.size() > 0)
+		if (!chipsList.isEmpty())
 			chipSelector.setSelection(0);
 		else
 			chipSelector.setSelection(-1);
@@ -240,7 +214,7 @@ public class PWMSampleActivity extends Activity {
 		channelsList.addAll(channels);
 		Collections.sort(channelsList);
 		channelsAdapter.notifyDataSetChanged();
-		if (channelsList.size() > 0)
+		if (!channelsList.isEmpty())
 			channelSelector.setSelection(0);
 		else
 			channelSelector.setSelection(-1);
@@ -400,7 +374,7 @@ public class PWMSampleActivity extends Activity {
 		long frequency;
 
 		String freqString = frequencyText.getText().toString();
-		if (freqString.length() == 0) {
+		if (freqString.isEmpty()) {
 			showToast("Frequency value cannot be empty");
 			return;
 		}
@@ -449,7 +423,7 @@ public class PWMSampleActivity extends Activity {
 		int dutyCycle;
 
 		String dutyCycleString = dutyCycleText.getText().toString();
-		if (dutyCycleString.length() == 0) {
+		if (dutyCycleString.isEmpty()) {
 			showToast("Duty cycle value cannot be empty");
 			return;
 		}
